@@ -485,7 +485,7 @@ class WordCloud(object):
                                     for word, freq in frequencies_org])
 
         # start drawing grey image
-        for word, freq in frequencies:
+        for ct, (word, freq) in enumerate(frequencies):
             if freq == 0:
                 continue
             # select the font size
@@ -528,6 +528,19 @@ class WordCloud(object):
                 break
 
             x, y = np.array(result) + self.margin // 2
+
+            # first 3 element at central
+            if ct == 0:
+                y = width//2 - box_size[0]//2
+                x = height//2 - box_size[1]//2
+            elif ct == 1:
+                y = width//2 - box_size[0]//2
+                x = height//2 + _box_size[1]//2 + self.margin
+            elif ct == 2:
+                y = width//2 - box_size[0]//2
+                x = height//2 - _box_size[1]//2 - box_size[1] - self.margin
+            _box_size = box_size
+
             # actually draw the text
             draw.text((y, x), word, fill="white", font=transposed_font)
             positions.append((x, y))
@@ -547,6 +560,8 @@ class WordCloud(object):
             # the order of the cumsum's is important for speed ?!
             occupancy.update(img_array, x, y)
             last_freq = freq
+
+            _result = result
 
         self.layout_ = list(zip(frequencies, font_sizes, positions,
                                 orientations, colors))
